@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+
+  <% include partials/_header %>
+
+  <h2> urls and their associated short forms </h2>
+
+      <% for (shortkey in urls){ %>
+
+      <li> <%= shortkey %> : <%= urls[shortkey] %><form method="POST" action="/urls/<%= shortkey %>/delete"> <input type="submit" value="delete">  </form> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li>
+      <%  } %>
+
+    <!--   <li> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li> -->
+
+      <h3> link for short URL </h3>
+
+
+
+  </form>
+
+</body>
+</html>

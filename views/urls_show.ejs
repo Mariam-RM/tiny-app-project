@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+
+  <% include partials/_header %>
+
+  <h2> page to show single url and its associated shortform </h2>
+
+
+       <%= shortkey %> : <%= longURL %>
+
+    <form method="POST" action="/urls/<%= shortkey %> ">
+
+      <input value="<%= longURL %>" type="text" name="longURL" >
+      <input type="submit" value="update">
+
+    </form>
+
+
+</body>
+</html>
