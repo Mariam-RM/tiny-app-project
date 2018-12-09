@@ -37,14 +37,17 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//url handler to pass URL data to template
-app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase,
-  username: req.cookies["username"]
-};
+// route that gets the registration page
+app.get("/urls/register", (req, res) => {
 
-  res.render("urls_index", templateVars);
+  let templateVars = { urls: urlDatabase,
+   username: req.cookies["username"]
+  };
+
+  res.render("urls_register", templateVars);
+  console.log("going to registration page")
 });
+
 
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
@@ -66,10 +69,19 @@ let shortkey = req.params.id
     username: req.cookies["username"]
 };
 
+  // console.log("")
+
   res.render("urls_show", templateVars);
 });
 
+//url handler to pass URL data to template
+app.get("/urls", (req, res) => {
+  let templateVars = { urls: urlDatabase,
+  username: req.cookies["username"]
+};
 
+  res.render("urls_index", templateVars);
+});
 
 // route that posts information to urls page from new page form --! currently rendering to urls_show.ejs
 app.post("/urls", (req, res) => {
@@ -168,6 +180,18 @@ app.post("/logout", (req,res) =>{
   const name = req.body.username
   res.cookie("username", name);
   res.clearCookie("username")
+  res.redirect("/urls");
+
+
+})
+
+app.post("/register", (req,res) =>{
+
+
+
+  // const name = req.body.username
+  // res.cookie("username", name);
+  // res.clearCookie("username")
   res.redirect("/urls");
 
 

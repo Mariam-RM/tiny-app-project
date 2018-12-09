@@ -3,17 +3,17 @@
 
 
     <% if (username) { %>
-      currently logged in as: <%= username %>
+     currently logged in as: <%= username %>
 
-      <form method="POST" action="/logout" >
-      <input type="submit" value="logout">
+    <form method="POST" action="/logout" >
+    <input type="submit" value="logout">
 
     <%  } else { %>
 
-      <form method="POST" action="/login">
-        <input type="text" name="username">
-        <input type="submit" value="login">
-      </form>
+     <form method="POST" action="/login">
+     <input type="text" name="username">
+      <input type="submit" value="login">
+     </form>
 
     <% } %>
 
