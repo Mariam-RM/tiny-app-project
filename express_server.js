@@ -144,11 +144,12 @@ app.get("/urls/new", (req, res) => {
 //route to page that displays single url and its shortened form
 app.get("/urls/:id", (req, res) => {
 
-let shortkey = req.params.id
-let newlongURL = urlDatabase[shortkey].longURL
+let shortkey = req.params.id;
+let longURL = urlDatabase[shortkey].longURL;
 
   let templateVars = { shortkey: shortkey,
-    longURL: newlongURL,
+    // longURL: longURL,
+    urls : urlDatabase,
     userDB: users,
     user_id:req.cookies["user_id"]
   };
@@ -157,6 +158,49 @@ let newlongURL = urlDatabase[shortkey].longURL
 
   res.render("urls_show", templateVars);
 });
+
+// post route that sends info from update page to get you back to /urls
+app.post("/urls/:id", (req,res) => {
+
+  let shortkey = req.params.id;
+  // let originalLongURL = urlDatabase[shortkey].longURL;
+  const newLongURL = req.body.longURL
+
+  urlDatabase[shortkey].longURL = newLongURL;
+
+  // console.log(req.body)
+  //  let templateVars = { urls: urlDatabase,
+  //   shortkey: req.params.id,
+  //   longURL: urlDatabase[req.params.id],
+  //  user_id:req.cookies["user_id"]
+  // };
+
+  //  let templateVars = {
+  //   shortkey: shortkey,
+  //   originalLongURL: urlDatabase,
+  //  user_id:req.cookies["user_id"]
+  // };
+
+
+  res.redirect("/urls") //templateVars)
+  // const shortKey = req.params.id;
+  // const LongURL = req.body.longURL;
+
+  // let templateVars = { urls: urlDatabase,
+  //  user_id:req.cookies["user_id"]
+  // };
+
+  //  // urlDatabase[shortKey].longURL = LongURL;
+
+  // if(!templateVars.user_id){
+  //   res.send("Error - can only update if logged in");
+  //   // res.redirect("/urls/login")
+  // } else {
+  //   urlDatabase[shortKey].longURL = LongURL;
+  //   res.redirect("/urls", templateVars);
+  // }
+});
+
 
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
@@ -203,45 +247,6 @@ app.post("/urls/:id/delete",(req,res) => {
  res.redirect("/urls")
 });
 
-// post route that sends info from update page to get you back to /urls
-app.post("/urls/:id", (req,res) => {
-
-  let shortkey = req.params.id;
-  let newlongURL = urlDatabase[shortkey],longURL;
-
-
-  // console.log(req.body)
-  //  let templateVars = { urls: urlDatabase,
-  //   shortkey: req.params.id,
-  //   longURL: urlDatabase[req.params.id],
-  //  user_id:req.cookies["user_id"]
-  // };
-
-   let templateVars = {
-    shortkey: shortkey,
-    newlongURL: urlDatabase,
-   user_id:req.cookies["user_id"]
-  };
-
-
-  res.redirect("/urls") //templateVars)
-  // const shortKey = req.params.id;
-  // const LongURL = req.body.longURL;
-
-  // let templateVars = { urls: urlDatabase,
-  //  user_id:req.cookies["user_id"]
-  // };
-
-  //  // urlDatabase[shortKey].longURL = LongURL;
-
-  // if(!templateVars.user_id){
-  //   res.send("Error - can only update if logged in");
-  //   // res.redirect("/urls/login")
-  // } else {
-  //   urlDatabase[shortKey].longURL = LongURL;
-  //   res.redirect("/urls", templateVars);
-  // }
-});
 
 // post that handles info from login form now on login page
 app.post("/login", (req,res) =>{
