@@ -39,13 +39,20 @@ app.get("/urls.json", (req, res) => {
 
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase,
+  username: req.cookies["username"]
+};
+
   res.render("urls_index", templateVars);
 });
 
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+
+  let templateVars = { urls: urlDatabase,
+   username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
 });
 
 
@@ -55,7 +62,9 @@ app.get("/urls/:id", (req, res) => {
 let shortkey = req.params.id
 
   let templateVars = { shortkey: req.params.id,
-    longURL: urlDatabase[req.params.id]};
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"]
+};
 
   res.render("urls_show", templateVars);
 });
@@ -122,8 +131,10 @@ app.post("/urls/:id", (req,res) => {
 app.post("/login", (req,res) =>{
 
  let name = req.body.username;
- // console.log(req.body.username);
-  res.cookie("username", name);
+ res.cookie("username", name);
+
+
+  // res.cookie("username", name);
   res.redirect("/urls");
 
 
@@ -147,6 +158,21 @@ app.post("/login", (req,res) =>{
 // }
 
 });
+
+// post that handles logout action from logout button in header
+
+app.post("/logout", (req,res) =>{
+
+
+
+  const name = req.body.username
+  res.cookie("username", name);
+  res.clearCookie("username")
+  res.redirect("/urls");
+
+
+})
+
 
 
 
