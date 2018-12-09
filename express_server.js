@@ -65,8 +65,16 @@ function isPasswordCorrect(email){
 
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    shortkey: "b2xVn2",
+    longURL: "http://www.lighthouselabs.ca",
+    user_id: "userRandomID"
+    },
+  "9sm5xK": {
+    shortkey: "9sm5xK",
+    longURL: "http://www.google.com",
+    user_id: "userRandomId"
+    }
 };
 
 
@@ -122,7 +130,14 @@ app.get("/urls/new", (req, res) => {
     userDB: users,
     user_id:req.cookies["user_id"]
   };
-  res.render("urls_new", templateVars);
+
+    if(!templateVars.user_id){
+    res.render("urls_login", templateVars);
+  } else {
+    res.render("urls_new", templateVars);
+  }
+
+
 });
 
 
@@ -130,9 +145,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id
+let newlongURL = urlDatabase[shortkey].longURL
 
-  let templateVars = { shortkey: req.params.id,
-    longURL: urlDatabase[req.params.id],
+  let templateVars = { shortkey: shortkey,
+    longURL: newlongURL,
     userDB: users,
     user_id:req.cookies["user_id"]
   };
@@ -156,9 +172,20 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
 
   longURL = req.body.longURL;
-  shortkey = generateRandomString();
+  let shortkey = generateRandomString();
 
-  urlDatabase[shortkey] = longURL; //adds new key-value to DB
+
+    // users[user_id] = {
+    //   id: user_id,
+    //   email: email,
+    //   password: password
+    // };
+
+  urlDatabase[shortkey] = {
+    shortkey : shortkey,
+    longURL: longURL,
+    user_id: "userid"
+  } ;//adds new key-value to DB
 
   console.log(urlDatabase)
 
@@ -187,9 +214,24 @@ app.post("/urls/:id/delete",(req,res) => {
 app.post("/urls/:id", (req,res) => {
 
   let shortkey = req.params.id;
+  let newlongURL = urlDatabase[shortkey],longURL;
+
 
   // console.log(req.body)
-  res.redirect("/urls")
+  //  let templateVars = { urls: urlDatabase,
+  //   shortkey: req.params.id,
+  //   longURL: urlDatabase[req.params.id],
+  //  user_id:req.cookies["user_id"]
+  // };
+
+   let templateVars = {
+    shortkey: shortkey,
+    newlongURL: urlDatabase,
+   user_id:req.cookies["user_id"]
+  };
+
+
+  res.redirect("/urls", templateVars)
   // const shortKey = req.params.id;
   // const LongURL = req.body.longURL;
 

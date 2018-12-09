@@ -11,7 +11,7 @@
 
       <% for (shortkey in urls){ %>
 
-      <li> <%= shortkey %> : <%= urls[shortkey] %><form method="POST" action="/urls/<%= shortkey %>/delete"> <input type="submit" value="delete">  </form> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li>
+      <li> <%= shortkey %> : <%= urls[shortkey].longURL %><form method="POST" action="/urls/<%= shortkey %>/delete"> <input type="submit" value="delete">  </form> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li>
       <%  } %>
 
     <!--   <li> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li> -->
