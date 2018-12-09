@@ -133,7 +133,7 @@ app.get("/urls/new", (req, res) => {
   };
 
     if(!templateVars.user_id){
-    res.render("urls_login", templateVars);
+    res.redirect("/urls/login");
   } else {
     res.render("urls_new", templateVars);
   }
@@ -142,7 +142,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 
-//route to page that displays single url and its shortened form
+//route to page that displays single url and its shortened form // only works after registered but if log in and out - give me issues
 app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
@@ -165,10 +165,10 @@ const user = req.cookies["user_id"];
   // }
 
   if (!user){
-    res.send("ERROR: User must be logged in to access edit feature")
-  } else if (user && urlDatabase[shortkey].user_id === user){
+    res.send("ERROR: User must be logged in to access edit feature");
+  } else {
 
-    let templateVars = { shortkey: shortkey,
+       let templateVars = { shortkey: shortkey,
       // longURL: longURL,
       urls : urlDatabase,
       userDB: users,
@@ -179,10 +179,31 @@ const user = req.cookies["user_id"];
     let longURL = urlDatabase[shortkey].longURL;
     res.render("urls_show", templateVars);
 
- } else {
-  res.send("ERROR: user can only edit own url entries")
- }
 
+  }
+
+
+
+//   if (user && urlDatabase[shortkey].user_id === user.id){
+
+//     let templateVars = { shortkey: shortkey,
+//       // longURL: longURL,
+//       urls : urlDatabase,
+//       userDB: users,
+//       user_id:req.cookies["user_id"]
+//     };
+
+
+//     let longURL = urlDatabase[shortkey].longURL;
+//     res.render("urls_show", templateVars);
+//      }
+//   } else {
+//   res.send("ERROR: user can only edit own url entries")
+// }
+
+// console.log("user: ", user);
+// console.log("user.id ", user.id)
+// console.log("urldb.. ", urlDatabase[shortkey].user_id )
 
  //   let shortkey = req.params.id;
  // const user = req.cookies["user_id"];
@@ -332,12 +353,12 @@ app.post("/urls/:id/delete",(req,res) => {
 
  if (!user){
   res.send("ERROR: User must be logged in to access delete feature")
- } else if (user && urlDatabase[shortkey].user_id === user){
+ } else {//if (user && urlDatabase[shortkey].user_id === user){
   delete urlDatabase[shortkey];
   res.redirect("/urls");
- } else {
-  res.send("ERROR: user can only delete own url entries")
- }
+ } //else {
+  //res.send("ERROR: user can only delete own url entries")
+ //}
 
  // delete urlDatabase[shortkey];
 
