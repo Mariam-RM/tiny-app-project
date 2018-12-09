@@ -118,8 +118,9 @@ app.get("/urls/login", (req, res) => {
     user_id:req.cookies["user_id"]
   };
 
+
   res.render("urls_login", templateVars);
-  console.log("can we login now?")
+  console.log("loging in")
 });
 
 
@@ -145,7 +146,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
-let longURL = urlDatabase[shortkey].longURL;
+// let longURL = urlDatabase[shortkey].longURL;
 
   let templateVars = { shortkey: shortkey,
     // longURL: longURL,
@@ -154,19 +155,48 @@ let longURL = urlDatabase[shortkey].longURL;
     user_id:req.cookies["user_id"]
   };
 
+  if(templateVars.user_id ==! urlDatabase[shortkey].user_id){
+    res.send("Error - can only edit own entires");
+    // res.redirect("/urls/login")
+  } else {
+  let longURL = urlDatabase[shortkey].longURL
+  res.render("urls_show", templateVars);
+  }
+
   // console.log("")
 
-  res.render("urls_show", templateVars);
+  // res.render("urls_show", templateVars);
 });
 
 // post route that sends info from update page to get you back to /urls
 app.post("/urls/:id", (req,res) => {
 
   let shortkey = req.params.id;
+  const user = req.cookies["user_id"];// not sure if this is really necessary at this point
   // let originalLongURL = urlDatabase[shortkey].longURL;
-  const newLongURL = req.body.longURL
+  // const newLongURL = req.body.longURL
 
-  urlDatabase[shortkey].longURL = newLongURL;
+     const newLongURL = req.body.longURL;
+      urlDatabase[shortkey].longURL = newLongURL;
+      res.redirect("/urls")
+
+  // if (user){
+
+  //   if (urlDatabase[shortkey].user_id === user.id) {
+  //     const newLongURL = req.body.longURL;
+  //     urlDatabase[shortkey].longURL = newLongURL;
+  //     res.redirect("/urls")
+
+        // // const { longURL } = req.body;
+        // urlDB[id].url = longURL;
+        // res.redirect('/urls');
+  //   } else {
+  //     res.send("Users can only edit their own URL");
+  //   }
+  // } else {
+  //   res.send("Not authorized");
+  // }
+
 
   // console.log(req.body)
   //  let templateVars = { urls: urlDatabase,
@@ -175,14 +205,35 @@ app.post("/urls/:id", (req,res) => {
   //  user_id:req.cookies["user_id"]
   // };
 
-  //  let templateVars = {
-  //   shortkey: shortkey,
-  //   originalLongURL: urlDatabase,
-  //  user_id:req.cookies["user_id"]
-  // };
+  //  if(!templateVars.user_id){
+  //   res.render("urls_login", templateVars);
+  // } else {
+  //   res.render("urls_new", templateVars);
+  // }
 
 
-  res.redirect("/urls") //templateVars)
+  // const user = users[req.session.userId];
+  // if (user) {
+  //   if (urlDB[id].userId === user.id) {
+  //     const { longURL } = req.body;
+  //     urlDB[id].url = longURL;
+  //     res.redirect('/urls');
+  //   } else {
+  //     res.status(403).send("User does not own the URL");
+  //   }
+  // } else {
+  //   res.status(401).send("Not authorized");
+  // }
+
+
+  // //  let templateVars = {
+  // //   shortkey: shortkey,
+  // //   originalLongURL: urlDatabase,
+  // //  user_id:req.cookies["user_id"]
+  // // };
+
+
+  // res.redirect("/urls") //templateVars)
   // const shortKey = req.params.id;
   // const LongURL = req.body.longURL;
 
@@ -242,9 +293,35 @@ app.get("/u/:shortURL", (req, res) => {
 //route that allows you to delete things from /url page
 app.post("/urls/:id/delete",(req,res) => {
  let shortkey = req.params.id;
+ const user = req.cookies["user_id"];
 
- delete urlDatabase[shortkey];
- res.redirect("/urls")
+ if (!user){
+  res.send("ERROR: User must be logged in to access delete feature")
+ } else if (user && urlDatabase[shortkey].user_id === user){
+  delete urlDatabase[shortkey];
+  res.redirect("/urls");
+ } else {
+  res.send("ERROR: user can only delete own url entries")
+ }
+
+ // delete urlDatabase[shortkey];
+
+
+// app.delete('/urls/:id/delete', (req, res) => {
+//   const { userId } = req.session;
+//   const { id } = req.params;
+
+//   if (!userId) {
+//     res.status(401).send("User has to be logged in");
+//   } else if (userId && urlDB[id].userId === userId) {
+//     delete urlDB[id];
+//   } else {
+//     res.status(403).send("User does not own the URL");
+//   }
+//   res.redirect('/urls');
+// });
+
+
 });
 
 
@@ -279,6 +356,9 @@ app.post("/login", (req,res) =>{
       user_id = findUserID(email);
       res.cookie("user_id", user_id)
       res.redirect("/urls");
+
+      // console.log("user login info :", user_id)
+      // console.log(res.cookie("user_id", user_id))
     }
   }
 
@@ -320,7 +400,7 @@ app.post("/register", (req,res) =>{
     res.cookie("user_id", user_id);
     res.redirect("/urls")
 
-    console.log(users);
+    // console.log("users db after new registration ", users);
     // console.log([user_id].email);
     // console.log(user_id)
     // console.log(users[user_id])
