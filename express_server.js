@@ -6,6 +6,17 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+//cookie parser info
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
+// var express = require("express");
+// var app = express();
+// var PORT = 8080; // default port 8080
+// var cookieParser = require('cookie-parser')
+
+// app.use(cookieParser())
+
 
 // function to genereate random string that will become shortkey
 function generateRandomString() {
@@ -107,7 +118,35 @@ app.post("/urls/:id", (req,res) => {
   // }
 });
 
+// post that handles info from login form in header
+app.post("/login", (req,res) =>{
 
+ let name = req.body.username;
+ // console.log(req.body.username);
+  res.cookie("username", name);
+  res.redirect("/urls");
+
+
+
+// let username = req.body.username
+
+// const email = req.body.email;
+// const password = req.body.password;
+
+// if ( !isUserEmailPresent(email)){
+//   res.send("Error 403 - User Not found")
+// } else {
+//   let checkpassword = isPasswordCorrect(email);
+//   if (checkpassword !== password){
+//     res.send("Error 403 - Password Incorrect");
+//   } else {
+//     user_id = findUserID(email);
+//     res.cookie("user_id", user_id)
+//     res.redirect("/urls");
+//   }
+// }
+
+});
 
 
 
