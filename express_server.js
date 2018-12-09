@@ -6,12 +6,19 @@ app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-//cookie parser info
-var cookieParser = require('cookie-parser')
-app.use(cookieParser())
+// //cookie parser info
+// var cookieParser = require('cookie-parser')
+// app.use(cookieParser())
 
 //bcrypt info
 const bcrypt = require('bcrypt');
+
+//cookie-sessions set up;
+var cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1','key2'],
+}))
 
 // var express = require("express");
 // var app = express();
@@ -104,7 +111,7 @@ app.get("/urls/register", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.cookies["user_id"]
+    user_id:req.session.user_id
   };
 
   res.render("urls_register", templateVars);
@@ -118,7 +125,7 @@ app.get("/urls/login", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.cookies["user_id"]
+    user_id:req.session.user_id
   };
 
 
@@ -132,7 +139,7 @@ app.get("/urls/new", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.cookies["user_id"]
+    user_id:req.session.user_id
   };
 
     if(!templateVars.user_id){
@@ -150,7 +157,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
-const user = req.cookies["user_id"];
+const user = req.session.user_id;
 // let longURL = urlDatabase[shortkey].longURL;
 
   // let templateVars = { shortkey: shortkey,
@@ -176,7 +183,7 @@ const user = req.cookies["user_id"];
       // longURL: longURL,
       urls : urlDatabase,
       userDB: users,
-      user_id:req.cookies["user_id"]
+      user_id:req.session.user_id
     };
 
 
@@ -232,7 +239,7 @@ const user = req.cookies["user_id"];
 app.post("/urls/:id", (req,res) => {
 
   let shortkey = req.params.id;
-  const user = req.cookies["user_id"];// not sure if this is really necessary at this point
+  const user = req.session.user_id// not sure if this is really necessary at this point
   // let originalLongURL = urlDatabase[shortkey].longURL;
   // const newLongURL = req.body.longURL
 
@@ -319,7 +326,7 @@ app.post("/urls/:id", (req,res) => {
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.cookies["user_id"]
+    user_id:req.session.user_id
 };
 
   res.render("urls_index", templateVars);
@@ -334,7 +341,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortkey] = {
     shortkey : shortkey,
     longURL: longURL,
-    user_id: req.cookies["user_id"] // adds associated userID key to urlDB
+    user_id: req.session.user_id // adds associated userID key to urlDB
   } ;//adds new key-value to DB
 
   console.log("url DB thats posts from new page form", urlDatabase)
@@ -355,7 +362,7 @@ app.get("/u/:shortURL", (req, res) => {
 //route that allows you to delete things from /url page
 app.post("/urls/:id/delete",(req,res) => {
  let shortkey = req.params.id;
- const user = req.cookies["user_id"];
+ const user = req.session.user_id
 
  if (!user){
   res.send("ERROR: User must be logged in to access delete feature")
@@ -400,7 +407,8 @@ app.post("/login", (req,res) =>{
   } else {
     if (bcrypt.compareSync(enteredPassword, hashPass)){
       user_id = findUserID(email);
-      res.cookie("user_id", user_id)
+
+      req.session.user_id = "user_id";
       res.redirect("/urls");
 
       console.log("passwords a match!")
@@ -456,8 +464,8 @@ app.post("/login", (req,res) =>{
 app.post("/logout", (req,res) =>{
 
  const user_id = req.body.login
-  res.cookie("user_id", user_id);
-  res.clearCookie("user_id")
+  req.session.user_id = user_id;
+  req.session = null;
   res.redirect("/urls");
 
 })
@@ -483,7 +491,7 @@ app.post("/register", (req,res) =>{
       email: email,
       password: hashedPassword
     };
-    res.cookie("user_id", user_id);
+    req.session.user_id ="user_id";
     res.redirect("/urls")
 
     // console.log("users db after new registration ", users);
