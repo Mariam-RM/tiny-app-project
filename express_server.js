@@ -231,7 +231,7 @@ app.post("/urls/:id", (req,res) => {
   };
 
 
-  res.redirect("/urls", templateVars)
+  res.redirect("/urls") //templateVars)
   // const shortKey = req.params.id;
   // const LongURL = req.body.longURL;
 
