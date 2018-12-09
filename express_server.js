@@ -174,17 +174,10 @@ app.post("/urls", (req, res) => {
   longURL = req.body.longURL;
   let shortkey = generateRandomString();
 
-
-    // users[user_id] = {
-    //   id: user_id,
-    //   email: email,
-    //   password: password
-    // };
-
   urlDatabase[shortkey] = {
     shortkey : shortkey,
     longURL: longURL,
-    user_id: "userid"
+    user_id: req.cookies["user_id"] // adds associated userID key to urlDB
   } ;//adds new key-value to DB
 
   console.log(urlDatabase)
