@@ -10,6 +10,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
+//bcrypt info
+const bcrypt = require('bcrypt');
+
 // var express = require("express");
 // var app = express();
 // var PORT = 8080; // default port 8080
@@ -50,7 +53,7 @@ function findUserID(email){
 }
 
 //function to return the associated password to a given email
-function isPasswordCorrect(email){
+function returnAssociatedPassword(email){
 
 
   for (const userId in users){
@@ -136,6 +139,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/urls/login");
   } else {
     res.render("urls_new", templateVars);
+    console.log("going to new url input page");
   }
 
 
@@ -236,6 +240,8 @@ app.post("/urls/:id", (req,res) => {
       urlDatabase[shortkey].longURL = newLongURL;
       res.redirect("/urls")
 
+
+      console.log("updated urlDB: ", urlDatabase);
   // if (user){
 
   //   if (urlDatabase[shortkey].user_id === user.id) {
@@ -331,7 +337,7 @@ app.post("/urls", (req, res) => {
     user_id: req.cookies["user_id"] // adds associated userID key to urlDB
   } ;//adds new key-value to DB
 
-  console.log(urlDatabase)
+  console.log("url DB thats posts from new page form", urlDatabase)
 
   res.redirect('http://localhost:8080/urls/' + shortkey)   //redirects to url page
 });
@@ -384,39 +390,62 @@ app.post("/urls/:id/delete",(req,res) => {
 // post that handles info from login form now on login page
 app.post("/login", (req,res) =>{
 
- // // let name = req.body.username;
+  const enteredPassword = req.body.password;
+  const email = req.body.email;
+
+  const hashPass = returnAssociatedPassword(email);
+
+  if ( !isUserEmailPresent(email)){
+    res.send("Error 403 - User Not found")
+  } else {
+    if (bcrypt.compareSync(enteredPassword, hashPass)){
+      user_id = findUserID(email);
+      res.cookie("user_id", user_id)
+      res.redirect("/urls");
+
+      console.log("passwords a match!")
+    } else {
+      res.send("Error 403 - Password Incorrect")
+    }
+
+  }
+
+   // // let name = req.body.username;
  // // res.cookie("username", name);
  //  const email = req.body.email;
  //  let user_id = findUserID(email);
  //    res.cookie("user_id", user_id)
  //    res.redirect("/urls");
 
+//     bcrypt.compareSync(enteredPassword, hashPass);
+//  //  // res.cookie("username", name);
+//  //  res.redirect("/urls");
 
- //  // res.cookie("username", name);
- //  res.redirect("/urls");
+//  bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword); // returns true
+// bcrypt.compareSync("pink-donkey-minotaur", hashedPassword); // returns fals
 
 
 
 // let username = req.body.username
 
-  const email = req.body.email;
-  const password = req.body.password;
+  // const email = req.body.email;
+  // const password = req.body.password;
 
-  if ( !isUserEmailPresent(email)){
-    res.send("Error 403 - User Not found")
-  } else {
-    let checkpassword = isPasswordCorrect(email);
-    if (checkpassword !== password){
-      res.send("Error 403 - Password Incorrect");
-    } else {
-      user_id = findUserID(email);
-      res.cookie("user_id", user_id)
-      res.redirect("/urls");
+  // if ( !isUserEmailPresent(email)){
+  //   res.send("Error 403 - User Not found")
+  // } else {
+  //   let checkpassword = isPasswordCorrect(email);
+  //   if (checkpassword !== password){
+  //     res.send("Error 403 - Password Incorrect");
+  //   } else {
+  //     user_id = findUserID(email);
+  //     res.cookie("user_id", user_id)
+  //     res.redirect("/urls");
 
-      // console.log("user login info :", user_id)
-      // console.log(res.cookie("user_id", user_id))
-    }
-  }
+  //     // console.log("user login info :", user_id)
+  //     // console.log(res.cookie("user_id", user_id))
+  //   }
+  // }
 
   // console.log("can we login?")
 
@@ -438,6 +467,7 @@ app.post("/register", (req,res) =>{
 
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   const emailAlreadyExist = isUserEmailPresent(email) //ie: user already registered
 
@@ -451,7 +481,7 @@ app.post("/register", (req,res) =>{
     users[user_id] = {
       id: user_id,
       email: email,
-      password: password
+      password: hashedPassword
     };
     res.cookie("user_id", user_id);
     res.redirect("/urls")
@@ -459,7 +489,7 @@ app.post("/register", (req,res) =>{
     // console.log("users db after new registration ", users);
     // console.log([user_id].email);
     // console.log(user_id)
-    // console.log(users[user_id])
+    console.log(users[user_id])
 
   } else {
     res.send("error : 400 - Bad Request Error - email already registered")
