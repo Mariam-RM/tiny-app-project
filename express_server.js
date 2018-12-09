@@ -65,7 +65,8 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls/register", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
-   username: req.cookies["username"]
+    userDB: users,
+    user_id:req.cookies["user_id"]
   };
 
   res.render("urls_register", templateVars);
@@ -77,7 +78,8 @@ app.get("/urls/register", (req, res) => {
 app.get("/urls/new", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
-   username: req.cookies["username"]
+    userDB: users,
+    user_id:req.cookies["user_id"]
   };
   res.render("urls_new", templateVars);
 });
@@ -90,8 +92,9 @@ let shortkey = req.params.id
 
   let templateVars = { shortkey: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies["username"]
-};
+    userDB: users,
+    user_id:req.cookies["user_id"]
+  };
 
   // console.log("")
 
@@ -101,7 +104,8 @@ let shortkey = req.params.id
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-  username: req.cookies["username"]
+    userDB: users,
+    user_id:req.cookies["user_id"]
 };
 
   res.render("urls_index", templateVars);
@@ -166,8 +170,12 @@ app.post("/urls/:id", (req,res) => {
 // post that handles info from login form in header
 app.post("/login", (req,res) =>{
 
- let name = req.body.username;
- res.cookie("username", name);
+ // let name = req.body.username;
+ // res.cookie("username", name);
+  const email = req.body.email;
+  let user_id = findUserID(email);
+    res.cookie("user_id", user_id)
+    res.redirect("/urls");
 
 
   // res.cookie("username", name);
@@ -199,56 +207,83 @@ app.post("/login", (req,res) =>{
 
 app.post("/logout", (req,res) =>{
 
-
-
-  const name = req.body.username
-  res.cookie("username", name);
-  res.clearCookie("username")
+ const user_id = req.body.login
+  res.cookie("user_id", user_id);
+  res.clearCookie("user_id")
   res.redirect("/urls");
-
 
 })
 
 //post that allows us to register new users into the users object
 app.post("/register", (req,res) =>{
 
-const email = req.body.email;
-const password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
-let user_id = generateRandomString();
-
-// let userObject = {
-//       id : user_id,
-//       email : email,
-//       password: password
-//       }
-
-// users[user_id] = userObject
-
-res.cookie("user_id", user_id)
+  const emailAlreadyExist = isUserEmailPresent(email) //ie: user already registered
 
 
   if ( email === "" || password === ""){
     res.send("error : 400 - Bad Request Error - invalid field entry");
-  } else if (isUserEmailPresent(email)){
-    res.send("error : 400 - Bad Request Error - email already registered")
-  } else {
-      let userObject = {
-      id : user_id,
-      email : email,
+  }
+
+  if (!emailAlreadyExist){
+    let user_id =  generateRandomString();
+    users[user_id] = {
+      id: user_id,
+      email: email,
       password: password
-      }
-     users[user_id] = userObject;
-     res.redirect("/urls");
-    }
+    };
+    res.cookie("user_id", user_id);
+    res.redirect("/urls")
+
+    console.log(users);
+    // console.log([user_id].email);
+    // console.log(user_id)
+    // console.log(users[user_id])
+
+  } else {
+    res.send("error : 400 - Bad Request Error - email already registered")
+  }
 
 
-  console.log(users)
+  //   if (!userExists) {
+  //   const id = uuidv4();
+  //   users[id] = {id, email, password: bcrypt.hashSync(password, 10)};
+  //   req.session.userId = id;
+  //   res.redirect('/urls');
+  // } else {
+  //   res.status(400).send("User already exists");
 
-  // const name = req.body.username
-  // res.cookie("username", name);
-  // res.clearCookie("username")
-  res.redirect("/urls");
+
+  // let user_id = generateRandomString();
+
+  // res.cookie("user_id", user_id)
+
+  // if ( email === "" || password === ""){
+  //   res.send("error : 400 - Bad Request Error - invalid field entry");
+  // } else if (isUserEmailPresent(email)){
+  //   res.send("error : 400 - Bad Request Error - email already registered")
+  // } else {
+  //     let userObject = {
+  //     id : user_id,
+  //     email : email,
+  //     password: password
+  //     }
+  //    users[user_id] = userObject;
+  //    res.redirect("/urls");
+  //   }
+
+
+    // console.log(users);
+    // console.log([user_id]);
+    // console.log(user_id)
+    // console.log(users[user_id])
+
+    // const name = req.body.username
+    // res.cookie("username", name);
+    // res.clearCookie("username")
+    // res.redirect("/urls");
 
 
 })
@@ -260,3 +295,23 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+  // const email = req.body.email;
+  // const password = req.body.password;
+
+  // let user_id = generateRandomString();
+
+  // res.cookie("user_id", user_id)
+
+  // if ( email === "" || password === ""){
+  //   res.send("error : 400 - Bad Request Error - invalid field entry");
+  // } else if (isUserEmailPresent(email)){
+  //   res.send("error : 400 - Bad Request Error - email already registered")
+  // } else {
+  //     let userObject = {
+  //     id : user_id,
+  //     email : email,
+  //     password: password
+  //     }
+  //    users[user_id] = userObject;
+  //    res.redirect("/urls");
+  //   }

@@ -2,8 +2,8 @@
 <html lang="en">
 
 
-    <% if (username) { %>
-     currently logged in as: <%= username %>
+    <% if (userDB[user_id]) { %>
+     currently logged in as: <%= userDB[user_id].email %>
 
     <form method="POST" action="/logout" >
     <input type="submit" value="logout">
@@ -11,7 +11,7 @@
     <%  } else { %>
 
      <form method="POST" action="/login">
-     <input type="text" name="username">
+     <input type="text" name="user_id">
       <input type="submit" value="login">
      </form>
 
