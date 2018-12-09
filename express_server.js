@@ -146,22 +146,57 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
+const user = req.cookies["user_id"];
 // let longURL = urlDatabase[shortkey].longURL;
 
-  let templateVars = { shortkey: shortkey,
-    // longURL: longURL,
-    urls : urlDatabase,
-    userDB: users,
-    user_id:req.cookies["user_id"]
-  };
+  // let templateVars = { shortkey: shortkey,
+  //   // longURL: longURL,
+  //   urls : urlDatabase,
+  //   userDB: users,
+  //   user_id:req.cookies["user_id"]
+  // };
 
-  if(templateVars.user_id ==! urlDatabase[shortkey].user_id){
-    res.send("Error - can only edit own entires");
-    // res.redirect("/urls/login")
-  } else {
-  let longURL = urlDatabase[shortkey].longURL
-  res.render("urls_show", templateVars);
-  }
+  // if(templateVars.user_id ==! urlDatabase[shortkey].user_id){
+  //   res.send("Error - can only edit own entires");
+  //   // res.redirect("/urls/login")
+  // } else {
+  // let longURL = urlDatabase[shortkey].longURL
+  // res.render("urls_show", templateVars);
+  // }
+
+  if (!user){
+    res.send("ERROR: User must be logged in to access edit feature")
+  } else if (user && urlDatabase[shortkey].user_id === user){
+
+    let templateVars = { shortkey: shortkey,
+      // longURL: longURL,
+      urls : urlDatabase,
+      userDB: users,
+      user_id:req.cookies["user_id"]
+    };
+
+
+    let longURL = urlDatabase[shortkey].longURL;
+    res.render("urls_show", templateVars);
+
+ } else {
+  res.send("ERROR: user can only edit own url entries")
+ }
+
+
+ //   let shortkey = req.params.id;
+ // const user = req.cookies["user_id"];
+
+ // if (!user){
+ //  res.send("ERROR: User must be logged in to access delete feature")
+ // } else if (user && urlDatabase[shortkey].user_id === user){
+ //  delete urlDatabase[shortkey];
+ //  res.redirect("/urls");
+ // } else {
+ //  res.send("ERROR: user can only delete own url entries")
+ // }
+
+
 
   // console.log("")
 
