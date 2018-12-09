@@ -2,18 +2,18 @@
 <html lang="en">
 
 
-    <% if (userDB[user_id]) { %>
-     currently logged in as: <%= userDB[user_id].email %>
-
-    <form method="POST" action="/logout" >
-    <input type="submit" value="logout">
+    <% if (!user_id) { %>
+       <a href="/urls/register"> register </a>
+        <a href="/urls/login"> login </a>
 
     <%  } else { %>
 
-     <form method="POST" action="/login">
-     <input type="text" name="user_id">
-      <input type="submit" value="login">
-     </form>
+     currently logged in as: <%= user_id.id %>
+
+    <form method="POST" action="/logout" >
+    <input type="submit" value="logout">
+    </form>
+
 
     <% } %>
 
@@ -21,3 +21,5 @@
 
 
 </html>
+
+

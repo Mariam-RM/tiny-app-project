@@ -37,6 +37,33 @@ function isUserEmailPresent(email){
   return false;
 }
 
+// function to return the user _id object (user_id, email and password) related to a given email
+function findUserID(email){
+
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+      // return users[userId].;
+    }
+  }
+  return false;
+}
+
+//function to return the associated password to a given email
+function isPasswordCorrect(email){
+
+
+  for (const userId in users){
+    if (users[userId].email === email){
+      return users[userId].password;
+    }
+
+  }
+  return false
+
+}
+
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -71,6 +98,20 @@ app.get("/urls/register", (req, res) => {
 
   res.render("urls_register", templateVars);
   console.log("going to registration page")
+});
+
+
+//route that gets you to the login page
+
+app.get("/urls/login", (req, res) => {
+
+  let templateVars = { urls: urlDatabase,
+    userDB: users,
+    user_id:req.cookies["user_id"]
+  };
+
+  res.render("urls_login", templateVars);
+  console.log("can we login now?")
 });
 
 
@@ -167,39 +208,41 @@ app.post("/urls/:id", (req,res) => {
   // }
 });
 
-// post that handles info from login form in header
+// post that handles info from login form now on login page
 app.post("/login", (req,res) =>{
 
- // let name = req.body.username;
- // res.cookie("username", name);
-  const email = req.body.email;
-  let user_id = findUserID(email);
-    res.cookie("user_id", user_id)
-    res.redirect("/urls");
+ // // let name = req.body.username;
+ // // res.cookie("username", name);
+ //  const email = req.body.email;
+ //  let user_id = findUserID(email);
+ //    res.cookie("user_id", user_id)
+ //    res.redirect("/urls");
 
 
-  // res.cookie("username", name);
-  res.redirect("/urls");
+ //  // res.cookie("username", name);
+ //  res.redirect("/urls");
 
 
 
 // let username = req.body.username
 
-// const email = req.body.email;
-// const password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
 
-// if ( !isUserEmailPresent(email)){
-//   res.send("Error 403 - User Not found")
-// } else {
-//   let checkpassword = isPasswordCorrect(email);
-//   if (checkpassword !== password){
-//     res.send("Error 403 - Password Incorrect");
-//   } else {
-//     user_id = findUserID(email);
-//     res.cookie("user_id", user_id)
-//     res.redirect("/urls");
-//   }
-// }
+  if ( !isUserEmailPresent(email)){
+    res.send("Error 403 - User Not found")
+  } else {
+    let checkpassword = isPasswordCorrect(email);
+    if (checkpassword !== password){
+      res.send("Error 403 - Password Incorrect");
+    } else {
+      user_id = findUserID(email);
+      res.cookie("user_id", user_id)
+      res.redirect("/urls");
+    }
+  }
+
+  // console.log("can we login?")
 
 });
 
