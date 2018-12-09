@@ -26,6 +26,17 @@ function generateRandomString() {
  return shortkey
 };
 
+//function to check if user exists (by seeing if email present in db)
+function isUserEmailPresent(email){
+
+  for (const user_id in users) {
+    if (users[user_id].email === email) {
+      return users[user_id];
+    }
+  }
+  return false;
+}
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -198,9 +209,41 @@ app.post("/logout", (req,res) =>{
 
 })
 
+//post that allows us to register new users into the users object
 app.post("/register", (req,res) =>{
 
+const email = req.body.email;
+const password = req.body.password;
 
+let user_id = generateRandomString();
+
+// let userObject = {
+//       id : user_id,
+//       email : email,
+//       password: password
+//       }
+
+// users[user_id] = userObject
+
+res.cookie("user_id", user_id)
+
+
+  if ( email === "" || password === ""){
+    res.send("error : 400 - Bad Request Error - invalid field entry");
+  } else if (isUserEmailPresent(email)){
+    res.send("error : 400 - Bad Request Error - email already registered")
+  } else {
+      let userObject = {
+      id : user_id,
+      email : email,
+      password: password
+      }
+     users[user_id] = userObject;
+     res.redirect("/urls");
+    }
+
+
+  console.log(users)
 
   // const name = req.body.username
   // res.cookie("username", name);
