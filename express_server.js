@@ -41,7 +41,7 @@ function isUserEmailPresent(email){
 
   for (const user_id in users) {
     if (users[user_id].email === email) {
-      return users[user_id];
+      return users[user_id].id;
     }
   }
   return false;
@@ -124,8 +124,8 @@ app.get("/urls/register", (req, res) => {
 app.get("/urls/login", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
-    userDB: users,
-    user_id:req.session.user_id
+    userID: users,
+    user_id: req.session.user_id
   };
 
 
@@ -324,12 +324,35 @@ app.post("/urls/:id", (req,res) => {
 
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
+
+ let user = users[req.session.user_id];
+
+ if (!user){
+  res.send("Please log in to view your urls")
+} else {
+
   let templateVars = { urls: urlDatabase,
     userDB: users,
     user_id:req.session.user_id
-};
+  };
 
   res.render("urls_index", templateVars);
+
+}
+
+ // function returnUsersUrl(id){
+
+
+
+ // }
+
+
+//   let templateVars = { urls: urlDatabase,
+//     userDB: users,
+//     user_id:req.session.user_id
+// };
+
+//   res.render("urls_index", templateVars);
 });
 
 // route that posts information to urls page from new page form --! currently rendering to urls_show.ejs
@@ -337,11 +360,12 @@ app.post("/urls", (req, res) => {
 
   longURL = req.body.longURL;
   let shortkey = generateRandomString();
+  const user_id = req.session.user_id.id;
 
   urlDatabase[shortkey] = {
     shortkey : shortkey,
     longURL: longURL,
-    user_id: req.session.user_id // adds associated userID key to urlDB
+    user_id: user_id//req.session.user_id// adds associated userID key to urlDB
   } ;//adds new key-value to DB
 
   console.log("url DB thats posts from new page form", urlDatabase)
@@ -406,12 +430,16 @@ app.post("/login", (req,res) =>{
     res.send("Error 403 - User Not found")
   } else {
     if (bcrypt.compareSync(enteredPassword, hashPass)){
+
       user_id = findUserID(email);
 
-      req.session.user_id = "user_id";
+      // console.log("passwords a match!, " , user_id)
+      req.session.user_id = user_id ;
+
+
       res.redirect("/urls");
 
-      console.log("passwords a match!")
+      // console.log("passwords a match!, " , User_id)
     } else {
       res.send("Error 403 - Password Incorrect")
     }
@@ -486,18 +514,21 @@ app.post("/register", (req,res) =>{
 
   if (!emailAlreadyExist){
     let user_id =  generateRandomString();
+
     users[user_id] = {
       id: user_id,
       email: email,
       password: hashedPassword
     };
-    req.session.user_id ="user_id";
+    req.session.user_id = user_id;
+
+    console.log(users)
     res.redirect("/urls")
 
     // console.log("users db after new registration ", users);
     // console.log([user_id].email);
     // console.log(user_id)
-    console.log(users[user_id])
+    // console.log(users[user_id])
 
   } else {
     res.send("error : 400 - Bad Request Error - email already registered")
