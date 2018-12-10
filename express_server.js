@@ -1,24 +1,37 @@
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
-
-app.set("view engine", "ejs");
 const bodyParser = require("body-parser");
+var cookieSession = require('cookie-session')
+//bcrypt info
+const bcrypt = require('bcrypt');
+app.set("view engine", "ejs");
+//cookie-sessions set up;
+// var cookieSession = require('cookie-session')
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1','key2'],
+}))
+
+
+// app.set("view engine", "ejs");
+// // const bodyParser = require("body-parser");
+// app.use(bodyParser.urlencoded({extended: true}));
 
 // //cookie parser info
 // var cookieParser = require('cookie-parser')
 // app.use(cookieParser())
 
-//bcrypt info
-const bcrypt = require('bcrypt');
+// //bcrypt info
+// const bcrypt = require('bcrypt');
 
-//cookie-sessions set up;
-var cookieSession = require('cookie-session')
-app.use(cookieSession({
-  name: 'session',
-  keys: ['key1','key2'],
-}))
+// //cookie-sessions set up;
+// var cookieSession = require('cookie-session')
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: ['key1','key2'],
+// }))
 
 // var express = require("express");
 // var app = express();
@@ -52,7 +65,7 @@ function findUserID(email){
 
   for (const userId in users) {
     if (users[userId].email === email) {
-      return users[userId];
+      return users[userId].id;
       // return users[userId].;
     }
   }
@@ -325,20 +338,28 @@ app.post("/urls/:id", (req,res) => {
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
 
- let user = users[req.session.user_id];
+ const user = users[req.session.user_id];
 
- if (!user){
-  res.send("Please log in to view your urls")
-} else {
 
-  let templateVars = { urls: urlDatabase,
+
+ if (user){
+
+    let templateVars = { urls: urlDatabase,
     userDB: users,
     user_id:req.session.user_id
-  };
+    };
 
-  res.render("urls_index", templateVars);
 
-}
+    console.log("checking what exactly userparambody are ", user)
+
+    res.render("urls_index", templateVars);
+
+
+  } else {
+    res.send("Please log in to view your urls")
+ };
+
+
 
  // function returnUsersUrl(id){
 
@@ -360,7 +381,7 @@ app.post("/urls", (req, res) => {
 
   longURL = req.body.longURL;
   let shortkey = generateRandomString();
-  const user_id = req.session.user_id.id;
+  const user_id = req.session.user_id;
 
   urlDatabase[shortkey] = {
     shortkey : shortkey,
@@ -433,7 +454,7 @@ app.post("/login", (req,res) =>{
 
       user_id = findUserID(email);
 
-      // console.log("passwords a match!, " , user_id)
+      console.log("passwords a match!, " , user_id)
       req.session.user_id = user_id ;
 
 
