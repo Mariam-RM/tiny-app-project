@@ -60,7 +60,7 @@ function isUserEmailPresent(email){
   return false;
 }
 
-// function to return the user _id object (user_id, email and password) related to a given email
+// function to return the user _id object related to a given email
 function findUserID(email){
 
   for (const userId in users) {
@@ -201,6 +201,7 @@ const user = req.session.user_id;
 
 
     let longURL = urlDatabase[shortkey].longURL;
+    console.log("this is the user from getting url/:id:  ", user)
     res.render("urls_show", templateVars);
 
 
@@ -338,19 +339,36 @@ app.post("/urls/:id", (req,res) => {
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
 
- const user = users[req.session.user_id];
+ const user = req.session.user_id ;
 
+ function returnMatchingURL(id){ //function to return matching posts to user
+console.log('id', id);
+
+  var url = [];
+
+  for (shortkey in urlDatabase){
+    url.push(urlDatabase[shortkey]);
+  }
+console.log('url', url)
+  var matchingURL = url.filter(function(entryinfo) {
+  return entryinfo.user_id === id ;
+  });
+
+  return matchingURL;
+ };
 
 
  if (user){
 
+
     let templateVars = { urls: urlDatabase,
     userDB: users,
+    matchingURL: returnMatchingURL(user),
     user_id:req.session.user_id
     };
 
 
-    console.log("checking what exactly userparambody are ", user)
+    console.log("checking what exactly user[cookies] means when get urls", user)
 
     res.render("urls_index", templateVars);
 
@@ -460,7 +478,7 @@ app.post("/login", (req,res) =>{
 
       res.redirect("/urls");
 
-      // console.log("passwords a match!, " , User_id)
+      console.log("passwords a match!, " , user_id)
     } else {
       res.send("Error 403 - Password Incorrect")
     }
@@ -543,7 +561,7 @@ app.post("/register", (req,res) =>{
     };
     req.session.user_id = user_id;
 
-    console.log(users)
+    console.log("user object after register new user", users)
     res.redirect("/urls")
 
     // console.log("users db after new registration ", users);
