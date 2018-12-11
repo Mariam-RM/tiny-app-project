@@ -1,3 +1,6 @@
+updated but now edit not working
+
+
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
@@ -150,6 +153,8 @@ app.get("/urls/login", (req, res) => {
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
 
+
+
   let templateVars = { urls: urlDatabase,
     userDB: users,
     user_id:req.session.user_id
@@ -191,17 +196,16 @@ const user = req.session.user_id;
   if (!user){
     res.send("ERROR: User must be logged in to access edit feature");
   } else {
-    let longURL = urlDatabase[shortkey].longURL;
 
-    let templateVars = { shortkey: shortkey,
-      longURL: longURL,
+       let templateVars = { shortkey: shortkey,
+      // longURL: longURL,
       urls : urlDatabase,
       userDB: users,
       user_id:req.session.user_id
     };
 
 
-    // let longURL = urlDatabase[shortkey].longURL;
+    let longURL = urlDatabase[shortkey].longURL;
     console.log("this is the user from getting url/:id:  ", user)
     res.render("urls_show", templateVars);
 
@@ -339,18 +343,29 @@ app.post("/urls/:id", (req,res) => {
 
 //url handler to pass URL data to template
 app.get("/urls", (req, res) => {
+console.log("usersdb ", users)
+
+ console.log("req.sesion ", req.session)
+
 
  const user = req.session.user_id ;
 
+ // const email = users[userid].email;
+ // console.log(email)
+
+ // console.log("usersdb ", users)
+
+ // console.log("req.sesion ", req.session)
+
  function returnMatchingURL(id){ //function to return matching posts to user
 console.log('id', id);
-
+console.log('url', url)
   var url = [];
 
   for (shortkey in urlDatabase){
     url.push(urlDatabase[shortkey]);
   }
-console.log('url', url)
+
   var matchingURL = url.filter(function(entryinfo) {
   return entryinfo.user_id === id ;
   });
@@ -360,6 +375,7 @@ console.log('url', url)
 
 
  if (user){
+
 
 
     let templateVars = { urls: urlDatabase,
