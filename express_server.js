@@ -152,39 +152,42 @@ if (!user){
   // };
 
 
+  // res.render("urls_login", templateVars);
+  // // console.log("is email present?", users[req.session.user_id].email)
+  // console.log("loging in")
 });
 
 
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
 
+  const user = users[req.session.user_id];
 
-const user = req.session.user_id;
+ // const email = users[req.session.user_id].email
 
-if (user) {
+ //  let templateVars = { urls: urlDatabase,
+ //    userDB: users,
+ //    user_id:req.session.user_id,
+ //    email: email
+  // };
 
- const email = users[req.session.user_id].email;
+    if(!user){
+    res.redirect("/urls/login");
 
-  let templateVars = { urls: urlDatabase,
-    userDB: users,
-    user_id:req.session.user_id,
-    email: email
-  };
+    } else {
 
-   res.render("urls_new", templateVars);
+    const email = users[req.session.user_id].email
 
-} else {
+      let templateVars = { urls: urlDatabase,
+        userDB: users,
+        user_id:req.session.user_id,
+        email: email
+      };
 
-res.redirect("/urls/login");
-
-}
-  //   if(!templateVars.user_id){
-  //   res.redirect("/urls/login");
-  // } else {
-  //   res.render("urls_new", templateVars);
-  //   console.log("going to new url input page");
-  //   // console.log("is email present?", users[req.session.user_id].email)
-  // }
+    res.render("urls_new", templateVars);
+    console.log("going to new url input page");
+    // console.log("is email present?", users[req.session.user_id].email)
+  }
 
 
 });
@@ -195,13 +198,14 @@ app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
 const user = req.session.user_id;
-const email = users[user].email;
+
 
 
   if (!user){
     res.send("ERROR: User must be logged in to access edit feature");
   } else {
     let longURL = urlDatabase[shortkey].longURL;
+    const email = users[user].email;
 
     let templateVars = { shortkey: shortkey,
       longURL: longURL,
@@ -325,9 +329,11 @@ app.post("/urls", (req, res) => {
 // route that allows you to go to the actual url associated with the randomly generated shortkey
 app.get("/u/:shortURL", (req, res) => {
 
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.shortURL].longURL;
 
   res.redirect(longURL);
+
+  console.log(longURL)
 });
 
 
