@@ -152,16 +152,18 @@ if (!user){
   // };
 
 
-  // res.render("urls_login", templateVars);
-  // // console.log("is email present?", users[req.session.user_id].email)
-  // console.log("loging in")
 });
 
 
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
 
- const email = users[req.session.user_id].email
+
+const user = req.session.user_id;
+
+if (user) {
+
+ const email = users[req.session.user_id].email;
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
@@ -169,13 +171,20 @@ app.get("/urls/new", (req, res) => {
     email: email
   };
 
-    if(!templateVars.user_id){
-    res.redirect("/urls/login");
-  } else {
-    res.render("urls_new", templateVars);
-    console.log("going to new url input page");
-    // console.log("is email present?", users[req.session.user_id].email)
-  }
+   res.render("urls_new", templateVars);
+
+} else {
+
+res.redirect("/urls/login");
+
+}
+  //   if(!templateVars.user_id){
+  //   res.redirect("/urls/login");
+  // } else {
+  //   res.render("urls_new", templateVars);
+  //   console.log("going to new url input page");
+  //   // console.log("is email present?", users[req.session.user_id].email)
+  // }
 
 
 });
