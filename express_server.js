@@ -113,7 +113,7 @@ app.get("/urls/register", (req, res) => {
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.session.user_id,
+    user_id:req.session.user_id
     // email: email
   };
 
@@ -126,7 +126,9 @@ app.get("/urls/register", (req, res) => {
 
 app.get("/urls/login", (req, res) => {
 
-// const email = users[req.session.user_id].email
+user = req.session.user_id;
+
+if (!user){
 
   let templateVars = { urls: urlDatabase,
     userID: users,
@@ -134,10 +136,25 @@ app.get("/urls/login", (req, res) => {
     // email: email
   };
 
-
   res.render("urls_login", templateVars);
   // console.log("is email present?", users[req.session.user_id].email)
   console.log("loging in")
+} else {
+
+  res.redirect("/urls")
+}
+// const email = users[req.session.user_id].email
+
+  // let templateVars = { urls: urlDatabase,
+  //   userID: users,
+  //   user_id: req.session.user_id,
+  //   // email: email
+  // };
+
+
+  // res.render("urls_login", templateVars);
+  // // console.log("is email present?", users[req.session.user_id].email)
+  // console.log("loging in")
 });
 
 
