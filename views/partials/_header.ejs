@@ -2,17 +2,19 @@
 <html lang="en">
 
 
-    <% if (!user_id) { %>
-       <a href="/urls/register"> register </a>
-        <a href="/urls/login"> login </a>
+    <% if (user_id) { %>
 
-    <%  } else { %>
-
-     currently logged in as: <%= user_id %>
+      currently logged in as: <%= email %>
 
     <form method="POST" action="/logout" >
     <input type="submit" value="logout">
     </form>
+
+    <%  } else { %>
+
+
+     <a href="/urls/register"> register </a>
+        <a href="/urls/login"> login </a>
 
 
     <% } %>
@@ -21,5 +23,4 @@
 
 
 </html>
-
 

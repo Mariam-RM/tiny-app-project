@@ -1,44 +1,20 @@
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
+
 const bodyParser = require("body-parser");
 var cookieSession = require('cookie-session')
+
 //bcrypt info
 const bcrypt = require('bcrypt');
 app.set("view engine", "ejs");
-//cookie-sessions set up;
-// var cookieSession = require('cookie-session')
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1','key2'],
 }))
 
-
-// app.set("view engine", "ejs");
-// // const bodyParser = require("body-parser");
-// app.use(bodyParser.urlencoded({extended: true}));
-
-// //cookie parser info
-// var cookieParser = require('cookie-parser')
-// app.use(cookieParser())
-
-// //bcrypt info
-// const bcrypt = require('bcrypt');
-
-// //cookie-sessions set up;
-// var cookieSession = require('cookie-session')
-// app.use(cookieSession({
-//   name: 'session',
-//   keys: ['key1','key2'],
-// }))
-
-// var express = require("express");
-// var app = express();
-// var PORT = 8080; // default port 8080
-// var cookieParser = require('cookie-parser')
-
-// app.use(cookieParser())
 
 
 // function to genereate random string that will become shortkey
@@ -119,12 +95,26 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+app.get("/", (req, res) => {
+
+  let user = req.session.user_id;
+
+  if(user){
+    res.redirect("/urls")
+  } else {
+    res.redirect("/urls/login")
+  }
+
+})
+
 // route that gets the registration page
 app.get("/urls/register", (req, res) => {
+// const email = users[req.session.user_id].email // might cause me problems - double check this works
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.session.user_id
+    user_id:req.session.user_id,
+    // email: email
   };
 
   res.render("urls_register", templateVars);
@@ -136,13 +126,17 @@ app.get("/urls/register", (req, res) => {
 
 app.get("/urls/login", (req, res) => {
 
+// const email = users[req.session.user_id].email
+
   let templateVars = { urls: urlDatabase,
     userID: users,
-    user_id: req.session.user_id
+    user_id: req.session.user_id,
+    // email: email
   };
 
 
   res.render("urls_login", templateVars);
+  // console.log("is email present?", users[req.session.user_id].email)
   console.log("loging in")
 });
 
@@ -150,9 +144,12 @@ app.get("/urls/login", (req, res) => {
 // route to go to new page where new urls are added
 app.get("/urls/new", (req, res) => {
 
+ const email = users[req.session.user_id].email
+
   let templateVars = { urls: urlDatabase,
     userDB: users,
-    user_id:req.session.user_id
+    user_id:req.session.user_id,
+    email: email
   };
 
     if(!templateVars.user_id){
@@ -160,6 +157,7 @@ app.get("/urls/new", (req, res) => {
   } else {
     res.render("urls_new", templateVars);
     console.log("going to new url input page");
+    // console.log("is email present?", users[req.session.user_id].email)
   }
 
 
@@ -171,22 +169,8 @@ app.get("/urls/:id", (req, res) => {
 
 let shortkey = req.params.id;
 const user = req.session.user_id;
-// let longURL = urlDatabase[shortkey].longURL;
+const email = users[user].email;
 
-  // let templateVars = { shortkey: shortkey,
-  //   // longURL: longURL,
-  //   urls : urlDatabase,
-  //   userDB: users,
-  //   user_id:req.cookies["user_id"]
-  // };
-
-  // if(templateVars.user_id ==! urlDatabase[shortkey].user_id){
-  //   res.send("Error - can only edit own entires");
-  //   // res.redirect("/urls/login")
-  // } else {
-  // let longURL = urlDatabase[shortkey].longURL
-  // res.render("urls_show", templateVars);
-  // }
 
   if (!user){
     res.send("ERROR: User must be logged in to access edit feature");
@@ -197,57 +181,18 @@ const user = req.session.user_id;
       longURL: longURL,
       urls : urlDatabase,
       userDB: users,
-      user_id:req.session.user_id
+      user_id:req.session.user_id,
+      email: email
     };
 
 
-    // let longURL = urlDatabase[shortkey].longURL;
     console.log("this is the user from getting url/:id:  ", user)
+    // console.log("is email present?", users[req.session.user_id].email)
     res.render("urls_show", templateVars);
 
 
   }
 
-
-
-//   if (user && urlDatabase[shortkey].user_id === user.id){
-
-//     let templateVars = { shortkey: shortkey,
-//       // longURL: longURL,
-//       urls : urlDatabase,
-//       userDB: users,
-//       user_id:req.cookies["user_id"]
-//     };
-
-
-//     let longURL = urlDatabase[shortkey].longURL;
-//     res.render("urls_show", templateVars);
-//      }
-//   } else {
-//   res.send("ERROR: user can only edit own url entries")
-// }
-
-// console.log("user: ", user);
-// console.log("user.id ", user.id)
-// console.log("urldb.. ", urlDatabase[shortkey].user_id )
-
- //   let shortkey = req.params.id;
- // const user = req.cookies["user_id"];
-
- // if (!user){
- //  res.send("ERROR: User must be logged in to access delete feature")
- // } else if (user && urlDatabase[shortkey].user_id === user){
- //  delete urlDatabase[shortkey];
- //  res.redirect("/urls");
- // } else {
- //  res.send("ERROR: user can only delete own url entries")
- // }
-
-
-
-  // console.log("")
-
-  // res.render("urls_show", templateVars);
 });
 
 // post route that sends info from update page to get you back to /urls
@@ -282,58 +227,6 @@ app.post("/urls/:id", (req,res) => {
   // }
 
 
-  // console.log(req.body)
-  //  let templateVars = { urls: urlDatabase,
-  //   shortkey: req.params.id,
-  //   longURL: urlDatabase[req.params.id],
-  //  user_id:req.cookies["user_id"]
-  // };
-
-  //  if(!templateVars.user_id){
-  //   res.render("urls_login", templateVars);
-  // } else {
-  //   res.render("urls_new", templateVars);
-  // }
-
-
-  // const user = users[req.session.userId];
-  // if (user) {
-  //   if (urlDB[id].userId === user.id) {
-  //     const { longURL } = req.body;
-  //     urlDB[id].url = longURL;
-  //     res.redirect('/urls');
-  //   } else {
-  //     res.status(403).send("User does not own the URL");
-  //   }
-  // } else {
-  //   res.status(401).send("Not authorized");
-  // }
-
-
-  // //  let templateVars = {
-  // //   shortkey: shortkey,
-  // //   originalLongURL: urlDatabase,
-  // //  user_id:req.cookies["user_id"]
-  // // };
-
-
-  // res.redirect("/urls") //templateVars)
-  // const shortKey = req.params.id;
-  // const LongURL = req.body.longURL;
-
-  // let templateVars = { urls: urlDatabase,
-  //  user_id:req.cookies["user_id"]
-  // };
-
-  //  // urlDatabase[shortKey].longURL = LongURL;
-
-  // if(!templateVars.user_id){
-  //   res.send("Error - can only update if logged in");
-  //   // res.redirect("/urls/login")
-  // } else {
-  //   urlDatabase[shortKey].longURL = LongURL;
-  //   res.redirect("/urls", templateVars);
-  // }
 });
 
 
@@ -341,6 +234,7 @@ app.post("/urls/:id", (req,res) => {
 app.get("/urls", (req, res) => {
 
  const user = req.session.user_id ;
+ // const email = users[user].email;
 
  function returnMatchingURL(id){ //function to return matching posts to user
 console.log('id', id);
@@ -361,16 +255,19 @@ console.log('url', url)
 
  if (user){
 
+  const email = users[user].email;
+
 
     let templateVars = { urls: urlDatabase,
     userDB: users,
     matchingURL: returnMatchingURL(user),
-    user_id:req.session.user_id
+    user_id:req.session.user_id,
+    email: email
     };
 
 
     console.log("checking what exactly user[cookies] means when get urls", user)
-
+    console.log("is email present?", users[req.session.user_id].email)
     res.render("urls_index", templateVars);
 
 
@@ -378,21 +275,6 @@ console.log('url', url)
     res.send("Please log in to view your urls")
  };
 
-
-
- // function returnUsersUrl(id){
-
-
-
- // }
-
-
-//   let templateVars = { urls: urlDatabase,
-//     userDB: users,
-//     user_id:req.session.user_id
-// };
-
-//   res.render("urls_index", templateVars);
 });
 
 // route that posts information to urls page from new page form --! currently rendering to urls_show.ejs
@@ -430,31 +312,10 @@ app.post("/urls/:id/delete",(req,res) => {
 
  if (!user){
   res.send("ERROR: User must be logged in to access delete feature")
- } else {//if (user && urlDatabase[shortkey].user_id === user){
+ } else {
   delete urlDatabase[shortkey];
   res.redirect("/urls");
- } //else {
-  //res.send("ERROR: user can only delete own url entries")
- //}
-
- // delete urlDatabase[shortkey];
-
-
-// app.delete('/urls/:id/delete', (req, res) => {
-//   const { userId } = req.session;
-//   const { id } = req.params;
-
-//   if (!userId) {
-//     res.status(401).send("User has to be logged in");
-//   } else if (userId && urlDB[id].userId === userId) {
-//     delete urlDB[id];
-//   } else {
-//     res.status(403).send("User does not own the URL");
-//   }
-//   res.redirect('/urls');
-// });
-
-
+ }
 });
 
 
@@ -485,45 +346,6 @@ app.post("/login", (req,res) =>{
     }
 
   }
-
-   // // let name = req.body.username;
- // // res.cookie("username", name);
- //  const email = req.body.email;
- //  let user_id = findUserID(email);
- //    res.cookie("user_id", user_id)
- //    res.redirect("/urls");
-
-//     bcrypt.compareSync(enteredPassword, hashPass);
-//  //  // res.cookie("username", name);
-//  //  res.redirect("/urls");
-
-//  bcrypt.compareSync("purple-monkey-dinosaur", hashedPassword); // returns true
-// bcrypt.compareSync("pink-donkey-minotaur", hashedPassword); // returns fals
-
-
-
-// let username = req.body.username
-
-  // const email = req.body.email;
-  // const password = req.body.password;
-
-  // if ( !isUserEmailPresent(email)){
-  //   res.send("Error 403 - User Not found")
-  // } else {
-  //   let checkpassword = isPasswordCorrect(email);
-  //   if (checkpassword !== password){
-  //     res.send("Error 403 - Password Incorrect");
-  //   } else {
-  //     user_id = findUserID(email);
-  //     res.cookie("user_id", user_id)
-  //     res.redirect("/urls");
-
-  //     // console.log("user login info :", user_id)
-  //     // console.log(res.cookie("user_id", user_id))
-  //   }
-  // }
-
-  // console.log("can we login?")
 
 });
 
@@ -565,81 +387,15 @@ app.post("/register", (req,res) =>{
     console.log("user object after register new user", users)
     res.redirect("/urls")
 
-    // console.log("users db after new registration ", users);
-    // console.log([user_id].email);
-    // console.log(user_id)
-    // console.log(users[user_id])
 
   } else {
     res.send("error : 400 - Bad Request Error - email already registered")
   }
 
 
-  //   if (!userExists) {
-  //   const id = uuidv4();
-  //   users[id] = {id, email, password: bcrypt.hashSync(password, 10)};
-  //   req.session.userId = id;
-  //   res.redirect('/urls');
-  // } else {
-  //   res.status(400).send("User already exists");
-
-
-  // let user_id = generateRandomString();
-
-  // res.cookie("user_id", user_id)
-
-  // if ( email === "" || password === ""){
-  //   res.send("error : 400 - Bad Request Error - invalid field entry");
-  // } else if (isUserEmailPresent(email)){
-  //   res.send("error : 400 - Bad Request Error - email already registered")
-  // } else {
-  //     let userObject = {
-  //     id : user_id,
-  //     email : email,
-  //     password: password
-  //     }
-  //    users[user_id] = userObject;
-  //    res.redirect("/urls");
-  //   }
-
-
-    // console.log(users);
-    // console.log([user_id]);
-    // console.log(user_id)
-    // console.log(users[user_id])
-
-    // const name = req.body.username
-    // res.cookie("username", name);
-    // res.clearCookie("username")
-    // res.redirect("/urls");
-
-
 })
-
-
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-  // const email = req.body.email;
-  // const password = req.body.password;
-
-  // let user_id = generateRandomString();
-
-  // res.cookie("user_id", user_id)
-
-  // if ( email === "" || password === ""){
-  //   res.send("error : 400 - Bad Request Error - invalid field entry");
-  // } else if (isUserEmailPresent(email)){
-  //   res.send("error : 400 - Bad Request Error - email already registered")
-  // } else {
-  //     let userObject = {
-  //     id : user_id,
-  //     email : email,
-  //     password: password
-  //     }
-  //    users[user_id] = userObject;
-  //    res.redirect("/urls");
-  //   }

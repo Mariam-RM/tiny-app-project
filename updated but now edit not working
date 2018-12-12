@@ -350,7 +350,7 @@ console.log("usersdb ", users)
 
  const user = req.session.user_id ;
 
- // const email = users[userid].email;
+ const email = users[userid].email;
  // console.log(email)
 
  // console.log("usersdb ", users)
