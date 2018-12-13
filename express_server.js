@@ -199,12 +199,17 @@ app.get("/urls/:id", (req, res) => {
 let shortkey = req.params.id;
 const user = req.session.user_id;
 
-
+if ( !urlDatabase[shortkey]){
+  res.send("url does not exist in database");
+    console.log("testing error message")
+} else {
 
   if (!user){
     res.send("ERROR: User must be logged in to access edit feature");
-  } else {
-    let longURL = urlDatabase[shortkey].longURL;
+  } else if ( urlDatabase[shortkey].user_id !== user){
+    res.send("ERROR: can only edit user's registered urls")
+  } else if (urlDatabase[shortkey].user_id === user){
+      let longURL = urlDatabase[shortkey].longURL;
     const email = users[user].email;
 
     let templateVars = { shortkey: shortkey,
@@ -217,11 +222,33 @@ const user = req.session.user_id;
 
 
     console.log("this is the user from getting url/:id:  ", user)
+    console.log("this is the urlDB to access the user: ", urlDatabase)
     // console.log("is email present?", users[req.session.user_id].email)
     res.render("urls_show", templateVars);
 
+ } else {
 
+    // res.send("url does not exist in database")
+    console.log("testing error message")
   }
+} // let longURL = urlDatabase[shortkey].longURL;
+    // const email = users[user].email;
+
+    // let templateVars = { shortkey: shortkey,
+    //   longURL: longURL,
+    //   urls : urlDatabase,
+    //   userDB: users,
+    //   user_id:req.session.user_id,
+    //   email: email
+    // };
+
+
+    // console.log("this is the user from getting url/:id:  ", user)
+    // // console.log("is email present?", users[req.session.user_id].email)
+    // res.render("urls_show", templateVars);
+
+
+  // }
 
 });
 
