@@ -116,7 +116,6 @@ app.get("/urls/register", (req, res) => {
   };
 
   res.render("urls_register", templateVars);
-  console.log("going to registration page")
 });
 
 
@@ -251,9 +250,7 @@ app.get("/urls", (req, res) => {
     };
 
 
-    console.log("checking what exactly user[cookies] means when get urls", user)
-    console.log("is email present?", users[req.session.user_id].email)
-    res.render("urls_index", templateVars);
+   res.render("urls_index", templateVars);
 
 
   } else {
@@ -275,8 +272,6 @@ app.post("/urls", (req, res) => {
     user_id: user_id
   } ;//adds new key-value to DB
 
-  console.log("url DB thats posts from new page form", urlDatabase)
-
   res.redirect('http://localhost:8080/urls/' + shortkey)   //redirects to url page
 });
 
@@ -287,8 +282,6 @@ app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL].longURL;
 
   res.redirect(longURL);
-
-  console.log(longURL)
 });
 
 
@@ -321,13 +314,11 @@ app.post("/login", (req,res) =>{
 
       user_id = findUserID(email);
 
-      console.log("passwords a match!, " , user_id)
       req.session.user_id = user_id ;
 
 
       res.redirect("/urls");
 
-      console.log("passwords a match!, " , user_id)
     } else {
       res.send("Error 403 - Password Incorrect")
     }
@@ -371,8 +362,7 @@ app.post("/register", (req,res) =>{
     };
     req.session.user_id = user_id;
 
-    console.log("user object after register new user", users)
-    res.redirect("/urls")
+    res.redirect("/urls");
 
 
   } else {

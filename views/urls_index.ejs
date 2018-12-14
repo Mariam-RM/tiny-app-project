@@ -14,10 +14,7 @@
       <li> <%= matchingURL[shortkey].shortkey %> : <%= matchingURL[shortkey].longURL %><form method="POST" action="/urls/<%= matchingURL[shortkey].shortkey %>/delete"> <input type="submit" value="delete">  </form> <a href="/urls/<%= matchingURL[shortkey].shortkey %>"><button class="btn">Edit</button></a> </li>
       <%  } %>
 
-    <!--   <li> <a href="/urls/<%= shortkey %>"><button class="btn">Edit</button></a> </li> -->
-
-      <!-- <h3> link to make new short URL </h3> -->
-          <a href="/urls/new "> Click here to make a new short url </a>
+            <a href="/urls/new "> Click here to make a new short url </a>
 
   </form>
 
