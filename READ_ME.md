@@ -4,7 +4,12 @@ Tiny app is a full stack web application built with Node and Express that allows
 
 ## Final Product
 
-
+!["screenshot of registration page"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/Registration_page.png)
+!["screenshot of login page"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/Login_page.png)
+!["screenshot of new-urls page"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/New_url.png)
+!["screenshot of edit-urls page"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/edit_url.png)
+!["screenshot of users main-urls page"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/urls_page.png)
+!["screenshot of successful redirection using /u/<"shortkey"> !"](https://github.com/Mariam-RM/tiny-app-project/blob/master/docs/successful_redirect.png)
 
 ## Dependencies:
 
