@@ -3,7 +3,7 @@ var app = express();
 var PORT = 8080; // default port 8080
 
 const bodyParser = require("body-parser");
-var cookieSession = require('cookie-session')
+var cookieSession = require('cookie-session');
 
 //bcrypt info
 const bcrypt = require('bcrypt');
@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1','key2'],
-}))
+}));
 
 
 
@@ -109,12 +109,10 @@ app.get("/", (req, res) => {
 
 // route that gets the registration page
 app.get("/urls/register", (req, res) => {
-// const email = users[req.session.user_id].email // might cause me problems - double check this works
 
   let templateVars = { urls: urlDatabase,
     userDB: users,
     user_id:req.session.user_id
-    // email: email
   };
 
   res.render("urls_register", templateVars);
@@ -126,35 +124,20 @@ app.get("/urls/register", (req, res) => {
 
 app.get("/urls/login", (req, res) => {
 
-user = req.session.user_id;
+  user = req.session.user_id;
 
-if (!user){
+  if (!user){
 
-  let templateVars = { urls: urlDatabase,
-    userID: users,
-    user_id: req.session.user_id,
-    // email: email
-  };
+    let templateVars = { urls: urlDatabase,
+      userID: users,
+      user_id: req.session.user_id,
+    };
+    res.render("urls_login", templateVars);
 
-  res.render("urls_login", templateVars);
-  // console.log("is email present?", users[req.session.user_id].email)
-  console.log("loging in")
-} else {
+  } else {
+    res.redirect("/urls");
+  }
 
-  res.redirect("/urls")
-}
-// const email = users[req.session.user_id].email
-
-  // let templateVars = { urls: urlDatabase,
-  //   userID: users,
-  //   user_id: req.session.user_id,
-  //   // email: email
-  // };
-
-
-  // res.render("urls_login", templateVars);
-  // // console.log("is email present?", users[req.session.user_id].email)
-  // console.log("loging in")
 });
 
 
@@ -162,14 +145,6 @@ if (!user){
 app.get("/urls/new", (req, res) => {
 
   const user = users[req.session.user_id];
-
- // const email = users[req.session.user_id].email
-
- //  let templateVars = { urls: urlDatabase,
- //    userDB: users,
- //    user_id:req.session.user_id,
- //    email: email
-  // };
 
     if(!user){
     res.redirect("/urls/login");
@@ -185,8 +160,7 @@ app.get("/urls/new", (req, res) => {
       };
 
     res.render("urls_new", templateVars);
-    console.log("going to new url input page");
-    // console.log("is email present?", users[req.session.user_id].email)
+
   }
 
 
@@ -196,59 +170,37 @@ app.get("/urls/new", (req, res) => {
 //route to page that displays single url and its shortened form // only works after registered but if log in and out - give me issues
 app.get("/urls/:id", (req, res) => {
 
-let shortkey = req.params.id;
-const user = req.session.user_id;
+  let shortkey = req.params.id;
+  const user = req.session.user_id;
 
-if ( !urlDatabase[shortkey]){
-  res.send("url does not exist in database");
-    console.log("testing error message")
-} else {
+  if ( !urlDatabase[shortkey]){
+    res.send("url does not exist in database");
+      console.log("testing error message")
+  } else {
 
-  if (!user){
-    res.send("ERROR: User must be logged in to access edit feature");
-  } else if ( urlDatabase[shortkey].user_id !== user){
-    res.send("ERROR: can only edit user's registered urls")
-  } else if (urlDatabase[shortkey].user_id === user){
-      let longURL = urlDatabase[shortkey].longURL;
-    const email = users[user].email;
+    if (!user){
+      res.send("ERROR: User must be logged in to access edit feature");
+    } else if ( urlDatabase[shortkey].user_id !== user){
+      res.send("ERROR: can only edit user's registered urls")
+    } else if (urlDatabase[shortkey].user_id === user){
+        let longURL = urlDatabase[shortkey].longURL;
+      const email = users[user].email;
 
-    let templateVars = { shortkey: shortkey,
-      longURL: longURL,
-      urls : urlDatabase,
-      userDB: users,
-      user_id:req.session.user_id,
-      email: email
-    };
+      let templateVars = { shortkey: shortkey,
+        longURL: longURL,
+        urls : urlDatabase,
+        userDB: users,
+        user_id:req.session.user_id,
+        email: email
+      };
 
+      res.render("urls_show", templateVars);
 
-    console.log("this is the user from getting url/:id:  ", user)
-    console.log("this is the urlDB to access the user: ", urlDatabase)
-    // console.log("is email present?", users[req.session.user_id].email)
-    res.render("urls_show", templateVars);
+   } else {
 
- } else {
-
-    // res.send("url does not exist in database")
-    console.log("testing error message")
+      console.log("testing error message")
+    }
   }
-} // let longURL = urlDatabase[shortkey].longURL;
-    // const email = users[user].email;
-
-    // let templateVars = { shortkey: shortkey,
-    //   longURL: longURL,
-    //   urls : urlDatabase,
-    //   userDB: users,
-    //   user_id:req.session.user_id,
-    //   email: email
-    // };
-
-
-    // console.log("this is the user from getting url/:id:  ", user)
-    // // console.log("is email present?", users[req.session.user_id].email)
-    // res.render("urls_show", templateVars);
-
-
-  // }
 
 });
 
@@ -256,34 +208,11 @@ if ( !urlDatabase[shortkey]){
 app.post("/urls/:id", (req,res) => {
 
   let shortkey = req.params.id;
-  const user = req.session.user_id// not sure if this is really necessary at this point
-  // let originalLongURL = urlDatabase[shortkey].longURL;
-  // const newLongURL = req.body.longURL
+  const user = req.session.user_id;
 
      const newLongURL = req.body.longURL;
       urlDatabase[shortkey].longURL = newLongURL;
-      res.redirect("/urls")
-
-
-      console.log("updated urlDB: ", urlDatabase);
-  // if (user){
-
-  //   if (urlDatabase[shortkey].user_id === user.id) {
-  //     const newLongURL = req.body.longURL;
-  //     urlDatabase[shortkey].longURL = newLongURL;
-  //     res.redirect("/urls")
-
-        // // const { longURL } = req.body;
-        // urlDB[id].url = longURL;
-        // res.redirect('/urls');
-  //   } else {
-  //     res.send("Users can only edit their own URL");
-  //   }
-  // } else {
-  //   res.send("Not authorized");
-  // }
-
-
+      res.redirect("/urls");
 });
 
 
@@ -291,17 +220,16 @@ app.post("/urls/:id", (req,res) => {
 app.get("/urls", (req, res) => {
 
  const user = req.session.user_id ;
- // const email = users[user].email;
+
 
  function returnMatchingURL(id){ //function to return matching posts to user
-console.log('id', id);
 
   var url = [];
 
   for (shortkey in urlDatabase){
     url.push(urlDatabase[shortkey]);
   }
-console.log('url', url)
+
   var matchingURL = url.filter(function(entryinfo) {
   return entryinfo.user_id === id ;
   });
@@ -344,7 +272,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortkey] = {
     shortkey : shortkey,
     longURL: longURL,
-    user_id: user_id//req.session.user_id// adds associated userID key to urlDB
+    user_id: user_id
   } ;//adds new key-value to DB
 
   console.log("url DB thats posts from new page form", urlDatabase)
