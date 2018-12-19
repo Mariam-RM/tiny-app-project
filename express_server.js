@@ -348,11 +348,12 @@ app.post("/register", (req,res) =>{
   const emailAlreadyExist = isUserEmailPresent(email) //ie: user already registered
 
 
-  if ( email === "" || password === ""){
+  if ( !email || !password ){
     res.send("error : 400 - Bad Request Error - invalid field entry");
+
   }
 
-  if (!emailAlreadyExist){
+  if (!emailAlreadyExist && email && password){
     let user_id =  generateRandomString();
 
     users[user_id] = {
@@ -376,3 +377,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+
+
+// NB:  use function that has uses startswith method to fix bug
