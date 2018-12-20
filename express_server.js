@@ -62,6 +62,14 @@ function returnAssociatedPassword(email){
 
 }
 
+function editURL(url){
+  if (url.startsWith('https://') || url.startsWith('http://')){
+    return url;
+  } else {
+     return 'https://' + url;
+  }
+}
+
 
 const urlDatabase = {
   "b2xVn2": {
@@ -279,7 +287,7 @@ app.post("/urls", (req, res) => {
 // route that allows you to go to the actual url associated with the randomly generated shortkey
 app.get("/u/:shortURL", (req, res) => {
 
-  let longURL = urlDatabase[req.params.shortURL].longURL;
+  let longURL = editURL(urlDatabase[req.params.shortURL].longURL);
 
   res.redirect(longURL);
 });
