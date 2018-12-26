@@ -8,17 +8,11 @@
   <% include partials/_header %>
 
   <h2> page to show single url and its associated shortform </h2>
-
-
-       <%= shortkey %> : <%= urls[shortkey].longURL %>
-
-    <form method="POST" action="/urls/<%= shortkey %> ">
-
-      <input value="<%= urls[shortkey].longURL %>" type="text" name="longURL" >
+    <%= shortKey %> : <%= urls[shortKey].longURL %>
+    <form method="POST" action="/urls/<%= shortKey %> ">
+      <input value="<%= urls[shortKey].longURL %>" type="text" name="longURL" >
       <input type="submit" value="update">
-
     </form>
-
 
 </body>
 </html>
