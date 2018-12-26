@@ -59,7 +59,7 @@ function isUserEmailPresent(email){
     }
   }
   return false;
-}
+};
 
 // function to return the user _id object related to a given email
 function findUserID(email){
@@ -69,7 +69,7 @@ function findUserID(email){
     }
   }
   return false;
-}
+};
 
 //function to return the associated password to a given email
 function returnAssociatedPassword(email){
@@ -79,7 +79,7 @@ function returnAssociatedPassword(email){
     }
   }
   return false;
-}
+};
 
 //function to edit url so it works regardless of what it starts with
 function editURL(url){
@@ -88,7 +88,7 @@ function editURL(url){
   } else {
     return 'https://' + url;
   }
-}
+};
 
 function returnMatchingURL(id){ //function to return matching posts to user
   var url = [];
@@ -112,7 +112,7 @@ app.get("/", (req, res) => {
   } else {
     res.redirect("/urls/login")
   }
-})
+});
 
 // route that gets the registration page
 app.get("/urls/register", (req, res) => {
@@ -186,7 +186,6 @@ app.get("/urls/:id", (req, res) => {
       console.log("testing error message")
     }
   }
-
 });
 
 // post route that sends info from update page to get you back to /urls
@@ -222,16 +221,13 @@ app.post("/urls", (req, res) => {
   longURL = req.body.longURL;
   const shortKey = generateRandomString();
   const userId = req.session.userId;
-
   urlDatabase[shortKey] = {
     shortKey : shortKey,
     longURL: longURL,
     userId: userId
   } ;//adds new key-value to DB
-
   res.redirect('/urls/' + shortKey)   //redirects to url page
 });
-
 
 // route that allows you to go to the actual url associated with the randomly generated shortKey
 app.get("/u/:shortURL", (req, res) => {
@@ -298,10 +294,8 @@ app.post("/register", (req,res) =>{
   } else {
     res.send("error : 400 - Bad Request Error - email already registered")
   }
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
