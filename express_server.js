@@ -42,7 +42,7 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 // function to genereate random string that will become shortKey
 function generateRandomString() {
@@ -271,7 +271,7 @@ app.post("/logout", (req,res) =>{
  req.session.userId = userId;
  req.session = null;
  res.redirect("/urls");
-})
+});
 
 //post that allows us to register new users into the users object
 app.post("/register", (req,res) =>{
